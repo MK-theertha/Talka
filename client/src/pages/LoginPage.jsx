@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import assets from '../assets/assets.js';
-// import { AuthContext } from '../context/AuthContext.jsx';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from 'src/context/AuthContext.jsx';
 
 const LoginPage = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [currState, setCurrState] = useState('login');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ const LoginPage = () => {
   const [bio, setBio] = useState('');
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
 
-  // const { login } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
@@ -21,14 +21,14 @@ const LoginPage = () => {
       setIsDataSubmitted(true);
       return;
     }
-    // login(currState === 'Sign up' ? 'signup' : 'login', {
-    //   fullName,
-    //   email,
-    //   password,
-    //   bio,
-    // }).then(() => {
-    //   navigate('/');
-    // });
+    login(currState === 'Sign up' ? 'signup' : 'login', {
+      fullName,
+      email,
+      password,
+      bio,
+    }).then(() => {
+      navigate('/');
+    });
   };
 
   return (

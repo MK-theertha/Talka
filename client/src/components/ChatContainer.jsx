@@ -1,17 +1,17 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import assets from '../assets/assets.js';
-// import { formatMessageTime } from '../lib/utils.js';
+import { formatMessageTime } from '../lib/utils.js';
 import { ChatContext } from '../context/ChatContext.jsx';
-// import { AuthContext } from '../context/AuthContext.jsx';
-// import toast from 'react-hot-toast';
+import { AuthContext } from '../context/AuthContext.jsx';
+import toast from 'react-hot-toast';
 
 const ChatContainer = () => {
   const { messages, selectedUser, setSelectedUser, sendMessage, getMessages } =
     useContext(ChatContext);
 
-  // const { authUser, onlineUsers } = useContext(AuthContext);
+  const { authUser, onlineUsers } = useContext(AuthContext);
 
-  // const scrollEnd = useRef();
+  const scrollEnd = useRef(null);
 
   const [input, setInput] = useState('');
 
@@ -24,10 +24,10 @@ const ChatContainer = () => {
 
   const handleSendImage = async (e) => {
     const file = e.target.files[0];
-    // if (!file || !file.type.startsWith('image/')) {
-    //   toast.error('Please select an image file');
-    //   return;
-    // }
+    if (!file || !file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = async () => {
       await sendMessage({ image: reader.result });
@@ -40,13 +40,13 @@ const ChatContainer = () => {
     if (selectedUser) {
       getMessages(selectedUser._id);
     }
-  }, [selectedUser]);
+  }, [selectedUser, getMessages]);
 
-  // useEffect(() => {
-  //   if (scrollEnd.current && messages && messages.length > 0) {
-  //     scrollEnd.current.scrollIntoView({ behavior: 'smooth' });
-  //   }
-  // }, [messages]);
+  useEffect(() => {
+    if (scrollEnd.current && messages && messages.length > 0) {
+      scrollEnd.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   return selectedUser ? (
     <div className='h-full overflow-scroll relative backdrop-blur-lg'>
@@ -59,9 +59,9 @@ const ChatContainer = () => {
         />
         <p className='flex-1 text-lg text-white flex items-center gap-2'>
           {selectedUser.fullName}
-          {/* {onlineUsers.includes(selectedUser._id) && (
+          {onlineUsers.includes(selectedUser._id) && (
             <span className='w-2 h-2 rounded-full bg-green-500'></span>
-          )} */}
+          )}
         </p>
         <img
           onClick={() => setSelectedUser(null)}
@@ -77,9 +77,9 @@ const ChatContainer = () => {
         {messages?.map((msg, index) => (
           <div
             key={index}
-            // className={`flex items-end justify-end gap-2  ${
-            //   msg.senderId !== authUser._id && 'flex-row-reverse'
-            // }`}
+            className={`flex items-end justify-end gap-2  ${
+              msg.senderId !== authUser._id && 'flex-row-reverse'
+            }`}
           >
             {msg.image ? (
               <img
@@ -89,13 +89,11 @@ const ChatContainer = () => {
               />
             ) : (
               <p
-                className={`p-2 max-w-[230px] md:text-sm font-light rounded-lg mb-8 break-all bg-violet-500/30 text-white 
-                  ${
-                    // msg.senderId === authUser._id
-                    //   ? 'rounded-br-none'
-                    'rounded-bl-none'
-                  }
-                `}
+                className={`p-2 max-w-[230px] md:text-sm font-light rounded-lg mb-8 break-all bg-violet-500/30 text-white ${
+                  msg.senderId === authUser._id
+                    ? 'rounded-br-none'
+                    : 'rounded-bl-none'
+                }`}
               >
                 {msg.text}
               </p>
@@ -103,21 +101,21 @@ const ChatContainer = () => {
             <div className='text-center text-xs'>
               <img
                 className='w-7 rounded-full'
-                // src={
-                //   msg.senderId === authUser._id
-                //     ? authUser.profilePic || assets.avatar_icon
-                //     : selectedUser?.profilePic || assets.avatar_icon
-                // }
+                src={
+                  msg.senderId === authUser._id
+                    ? authUser.profilePic || assets.avatar_icon
+                    : selectedUser?.profilePic || assets.avatar_icon
+                }
                 alt=''
               />
-              {/* <p className='text-gray-500'>
+              <p className='text-gray-500'>
                 {formatMessageTime(msg.createdAt)}
-              </p> */}
+              </p>
             </div>
           </div>
         ))}
 
-        {/* <div ref={scrollEnd}></div> */}
+        <div ref={scrollEnd}></div>
       </div>
 
       {/* {------bottom area------} */}
